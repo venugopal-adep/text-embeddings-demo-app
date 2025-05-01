@@ -41,7 +41,7 @@ To run this application, you need:
 
 1. Clone this repository:
    ```
-   git clone https://github.com/yourusername/text-embeddings-app.git
+   git clone [https://github.com/yourusername/text-embeddings-app.git](https://github.com/venugopal-adep/text-embeddings-demo-app.git)
    ```
 
 2. Navigate to the project directory:
