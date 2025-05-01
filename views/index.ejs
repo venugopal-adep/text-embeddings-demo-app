@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+  <div class="container mt-4">
+    <header class="mb-5">
+      <h1 class="text-center">Text Embedding Models</h1>
+      <p class="lead text-center">From Basics to Advanced</p>
+    </header>
+
+    <div class="row mb-5">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h2>What are Embeddings?</h2>
+          </div>
+          <div class="card-body">
+            <p>Embeddings are dense vector representations of words or phrases that capture semantic relationships. They allow us to represent text in a way that machines can understand and process.</p>
+            <p>This application demonstrates various text embedding techniques, progressing from simple to more complex models.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Navigation tabs -->
+      <div class="col-md-12">
+        <ul class="nav nav-tabs" id="embeddingTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="one-hot-tab" data-bs-toggle="tab" data-bs-target="#one-hot" type="button" role="tab" aria-controls="one-hot" aria-selected="true">One-Hot Encoding</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="bow-tab" data-bs-toggle="tab" data-bs-target="#bow" type="button" role="tab" aria-controls="bow" aria-selected="false">Bag of Words</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="tfidf-tab" data-bs-toggle="tab" data-bs-target="#tfidf" type="button" role="tab" aria-controls="tfidf" aria-selected="false">TF-IDF</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="word-embeddings-tab" data-bs-toggle="tab" data-bs-target="#word-embeddings" type="button" role="tab" aria-controls="word-embeddings" aria-selected="false">Word Embeddings</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link" id="compare-tab" data-bs-toggle="tab" data-bs-target="#compare" type="button" role="tab" aria-controls="compare" aria-selected="false">Compare Methods</button>
+          </li>
+        </ul>
+        
+        <!-- Tab content -->
+        <div class="tab-content" id="embeddingTabsContent">
+          <!-- One-Hot Encoding Tab -->
+          <div class="tab-pane fade show active" id="one-hot" role="tabpanel" aria-labelledby="one-hot-tab">
+            <div class="card">
+              <div class="card-header">
+                <h3>One-Hot Encoding</h3>
+              </div>
+              <div class="card-body">
+                <p>The simplest form of word embedding. Each word is represented as a binary vector where only one element is 1 (hot) and the rest are 0.</p>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label for="oneHotText">Enter a sentence:</label>
+                      <textarea id="oneHotText" class="form-control" rows="3">cat sits on mat</textarea>
+                    </div>
+                    <button id="oneHotAnalyzeBtn" class="btn btn-primary">Analyze</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="alert alert-info">
+                      <h5>Advantages:</h5>
+                      <ul>
+                        <li>Simple to implement</li>
+                        <li>No assumptions about word relationships</li>
+                      </ul>
+                      <h5>Disadvantages:</h5>
+                      <ul>
+                        <li>Dimensionality increases with vocabulary size</li>
+                        <li>No notion of word similarity</li>
+                        <li>Sparse representation</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="oneHotResults" class="mt-4 results-section" style="display:none;">
+                  <h4>Results</h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div id="oneHotStats" class="mb-3"></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="visualization-container">
+                        <canvas id="oneHotChart" width="400" height="300"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <table id="oneHotTable" class="table table-bordered table-striped mt-3">
+                    <thead>
+                      <tr>
+                        <th>Word</th>
+                        <!-- Dynamic columns for dimensions -->
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <!-- Dynamically populated -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bag of Words Tab -->
+          <div class="tab-pane fade" id="bow" role="tabpanel" aria-labelledby="bow-tab">
+            <div class="card">
+              <div class="card-header">
+                <h3>Bag of Words (Count Vectorization)</h3>
+              </div>
+              <div class="card-body">
+                <p>Bag of Words (BoW) is a method that counts the frequency of each word in a document, discarding grammar and word order.</p>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label for="bowText">Enter sentences (one per line):</label>
+                      <textarea id="bowText" class="form-control" rows="5">The cat sits on the mat
+The dog sits on the floor
+The cat and dog play together</textarea>
+                    </div>
+                    <button id="bowAnalyzeBtn" class="btn btn-primary">Analyze</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="alert alert-info">
+                      <h5>Advantages:</h5>
+                      <ul>
+                        <li>Simple to understand and implement</li>
+                        <li>Captures word frequency information</li>
+                      </ul>
+                      <h5>Disadvantages:</h5>
+                      <ul>
+                        <li>Ignores word order and context</li>
+                        <li>Sparse representation</li>
+                        <li>High dimensionality</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="bowResults" class="mt-4 results-section" style="display:none;">
+                  <h4>Results</h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div id="bowStats" class="mb-3"></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="visualization-container">
+                        <canvas id="bowChart" width="400" height="300"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 class="mt-3">Bag of Words Matrix</h5>
+                  <div class="table-responsive">
+                    <table id="bowTable" class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th>Document</th>
+                          <!-- Dynamic columns for words -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Dynamically populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <h5 class="mt-4">Document Similarity Matrix</h5>
+                  <div class="visualization-container mt-2">
+                    <canvas id="bowSimilarityChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- TF-IDF Tab -->
+          <div class="tab-pane fade" id="tfidf" role="tabpanel" aria-labelledby="tfidf-tab">
+            <div class="card">
+              <div class="card-header">
+                <h3>TF-IDF (Term Frequency-Inverse Document Frequency)</h3>
+              </div>
+              <div class="card-body">
+                <p>TF-IDF extends the bag of words model by weighting terms based on how important they are to a document in a collection.</p>
+                
+                <div class="alert alert-secondary mb-3">
+                  <h5>TF-IDF Formula:</h5>
+                  <p><strong>TF-IDF = TF × IDF</strong></p>
+                  <p><strong>TF (Term Frequency):</strong> How frequently a term appears in a document.<br>
+                     TF(t, d) = (Number of times term t appears in document d) / (Total number of terms in document d)</p>
+                  <p><strong>IDF (Inverse Document Frequency):</strong> How rare a term is across all documents.<br>
+                     IDF(t) = log(Total number of documents / Number of documents containing term t)</p>
+                  <p>Higher TF-IDF values indicate terms that are both frequent in a specific document and rare across the corpus, making them more important for document distinction.</p>
+                </div>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label for="tfidfText">Enter sentences (one per line):</label>
+                      <textarea id="tfidfText" class="form-control" rows="5">The cat sits on the mat
+The dog sits on the floor
+The cat and dog play together</textarea>
+                    </div>
+                    <button id="tfidfAnalyzeBtn" class="btn btn-primary">Analyze</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="alert alert-info">
+                      <h5>Advantages:</h5>
+                      <ul>
+                        <li>Captures word importance in context of the document collection</li>
+                        <li>Reduces the impact of common words</li>
+                      </ul>
+                      <h5>Disadvantages:</h5>
+                      <ul>
+                        <li>Still ignores word order and semantic meaning</li>
+                        <li>Sparse representation</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="tfidfResults" class="mt-4 results-section" style="display:none;">
+                  <h4>Results</h4>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="visualization-container">
+                        <canvas id="tfidfChart" width="400" height="300"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  <h5 class="mt-3">TF-IDF Matrix</h5>
+                  <div class="table-responsive">
+                    <table id="tfidfTable" class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th>Document</th>
+                          <!-- Dynamic columns for words -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Dynamically populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <h5 class="mt-4">Document Similarity Matrix</h5>
+                  <div class="visualization-container mt-2">
+                    <canvas id="tfidfSimilarityChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Word Embeddings Tab -->
+          <div class="tab-pane fade" id="word-embeddings" role="tabpanel" aria-labelledby="word-embeddings-tab">
+            <div class="card">
+              <div class="card-header">
+                <h3>Word Embeddings</h3>
+              </div>
+              <div class="card-body">
+                <p>Word embeddings represent words as continuous vector spaces where semantically similar words are closer to each other.</p>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label for="embeddingText">Enter sentences (one per line):</label>
+                      <textarea id="embeddingText" class="form-control" rows="5">The cat sits on the mat
+The dog sits on the floor
+The cat and dog play together</textarea>
+                    </div>
+                    <button id="embeddingAnalyzeBtn" class="btn btn-primary">Analyze</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="alert alert-info">
+                      <h5>Advantages:</h5>
+                      <ul>
+                        <li>Captures semantic relationships between words</li>
+                        <li>Lower dimensionality than one-hot encoding</li>
+                        <li>Enables meaningful vector operations</li>
+                      </ul>
+                      <h5>Disadvantages:</h5>
+                      <ul>
+                        <li>Requires large training corpus</li>
+                        <li>Fixed vocabulary</li>
+                        <li>Context-independent (same vector for all uses of a word)</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="embeddingResults" class="mt-4 results-section" style="display:none;">
+                  <h4>Results</h4>
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div id="embeddingVisualization" class="visualization-container" style="height: 400px;"></div>
+                    </div>
+                  </div>
+                  
+                  <h5 class="mt-4">Sentence Embeddings</h5>
+                  <div class="table-responsive">
+                    <table id="embeddingTable" class="table table-bordered table-striped">
+                      <thead>
+                        <tr>
+                          <th>Sentence</th>
+                          <th>Dimension 1</th>
+                          <th>Dimension 2</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <!-- Dynamically populated -->
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <h5 class="mt-4">Sentence Similarity Matrix</h5>
+                  <div class="visualization-container mt-2">
+                    <canvas id="embeddingSimilarityChart" width="400" height="300"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Compare Methods Tab -->
+          <div class="tab-pane fade" id="compare" role="tabpanel" aria-labelledby="compare-tab">
+            <div class="card">
+              <div class="card-header">
+                <h3>Compare Embedding Methods</h3>
+              </div>
+              <div class="card-body">
+                <p>Compare different embedding techniques to see which ones work best for different types of text.</p>
+                
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group mb-3">
+                      <label for="sentence1">Sentence 1:</label>
+                      <input type="text" id="sentence1" class="form-control" value="The cat sits on the mat">
+                    </div>
+                    <div class="form-group mb-3">
+                      <label for="sentence2">Sentence 2:</label>
+                      <input type="text" id="sentence2" class="form-control" value="A dog is sitting on the floor">
+                    </div>
+                    <button id="compareBtn" class="btn btn-primary">Compare</button>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="alert alert-info">
+                      <h5>What This Shows:</h5>
+                      <p>This comparison demonstrates how different embedding methods calculate similarity between sentences:</p>
+                      <ul>
+                        <li><strong>One-Hot/Bag of Words:</strong> Based on exact word overlap</li>
+                        <li><strong>TF-IDF:</strong> Weighs words by their importance in the corpus</li>
+                        <li><strong>Word Embeddings:</strong> Captures semantic relationships between words</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="compareResults" class="mt-4 results-section" style="display:none;">
+                  <h4>Results</h4>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div id="compareStats" class="mb-3"></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="visualization-container">
+                        <canvas id="compareChart" width="400" height="300"></canvas>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="compareAnalysis" class="mt-4"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <footer class="mt-5 text-center text-muted">
+      <hr>
+      <p>Text Embedding Models Demo &copy; 2025</p>
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
